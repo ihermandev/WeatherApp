@@ -1,4 +1,4 @@
-package i.herman.weatherapp
+package i.herman.weatherapp.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
