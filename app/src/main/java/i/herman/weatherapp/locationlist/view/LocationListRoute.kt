@@ -74,7 +74,6 @@ fun LocationListRoute(
                     data?.let {
                         val place = Autocomplete.getPlaceFromIntent(it)
                         requireNotNull(place)
-                        println(place.toString())
                         viewModel.processIntent(
                             LocationListViewIntent.AddLocation(location = place.asExternalModel()))
                     }
@@ -86,7 +85,7 @@ fun LocationListRoute(
                     }
                 }
                 Activity.RESULT_CANCELED -> {
-                    // The user canceled the operation.
+                    //TODO The user canceled the operation.
                 }
             }
         }
