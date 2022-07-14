@@ -1,4 +1,4 @@
-package i.herman.weatherapp.ui.util
+package i.herman.weatherapp.ui.core
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween

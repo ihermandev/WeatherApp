@@ -9,7 +9,11 @@ sealed class LocationListViewIntent : BaseIntent {
 
     object OnAddLocationClick : LocationListViewIntent()
 
-    object OnLocationClick : LocationListViewIntent()
+    class OnLocationClick(
+        val location: String,
+        val lat: Double,
+        val lng: Double,
+    ) : LocationListViewIntent()
 
     class AddLocation(
         val location: LocationItem,

@@ -9,14 +9,16 @@ import androidx.navigation.compose.rememberNavController
 import i.herman.weatherapp.navigation.WeatherNavHost
 import i.herman.weatherapp.ui.theme.WeatherAppTheme
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherApp() {
     WeatherAppTheme {
         val navController = rememberNavController()
 
-        Scaffold(modifier = Modifier, containerColor = MaterialTheme.colorScheme.onBackground) {
+        Scaffold(
+            modifier = Modifier,
+            containerColor = MaterialTheme.colorScheme.onBackground
+        ) {
             WeatherNavHost(navController = navController)
         }
     }
