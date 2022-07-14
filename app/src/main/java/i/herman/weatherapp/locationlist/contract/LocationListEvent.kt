@@ -4,5 +4,9 @@ import i.herman.weatherapp.base.BaseViewEvent
 
 sealed class LocationListEvent : BaseViewEvent {
 
-    object OnLocationDetailsClick : LocationListEvent()
+    class OnLocationDetailsClick(
+        val location: String,
+        val lat: Double,
+        val lng: Double,
+    ) : LocationListEvent()
 }

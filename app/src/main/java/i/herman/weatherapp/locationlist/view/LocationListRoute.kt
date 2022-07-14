@@ -20,6 +20,9 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.DateRange
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,10 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.android.libraries.places.api.model.Place
@@ -38,7 +43,7 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import i.herman.weatherapp.R
-import i.herman.weatherapp.TimeZoneBroadcastReceiver
+import i.herman.weatherapp.locationlist.util.TimeZoneBroadcastReceiver
 import i.herman.weatherapp.locationlist.contract.LocationListEvent
 import i.herman.weatherapp.locationlist.contract.LocationListViewIntent
 import i.herman.weatherapp.locationlist.contract.LocationListViewState
@@ -46,10 +51,10 @@ import i.herman.weatherapp.locationlist.model.LocationItem
 import i.herman.weatherapp.locationlist.model.LocationListState
 import i.herman.weatherapp.locationlist.util.asExternalModel
 import i.herman.weatherapp.locationlist.viewmodel.LocationListViewModel
-import i.herman.weatherapp.ui.util.AnimatedSwipeDismiss
-import i.herman.weatherapp.ui.util.LoadingWheel
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toJavaInstant
+import i.herman.weatherapp.ui.core.AnimatedSwipeDismiss
+import i.herman.weatherapp.ui.core.ContentLoading
+import i.herman.weatherapp.ui.core.WeatherSimpleTopBar
+import kotlinx.datetime.*
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -110,7 +115,12 @@ fun LocationListRoute(
 
                 }
                 is LocationListViewIntent.OnLocationClick -> {
-                    onEvent(LocationListEvent.OnLocationDetailsClick)
+                    onEvent.invoke(LocationListEvent.OnLocationDetailsClick(
+                        location = locationListIntent.location,
+                        lat = locationListIntent.lat,
+                        lng = locationListIntent.lng
+                    )
+                    )
                 }
             }
         },
@@ -119,6 +129,7 @@ fun LocationListRoute(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationListScreen(
     modifier: Modifier = Modifier,
@@ -126,32 +137,44 @@ fun LocationListScreen(
     locationListIntent: (LocationListViewIntent) -> Unit = {},
 ) {
 
-    val commonPadding = 16.dp
-
-    when (state) {
-        is LocationListState.LocationChosen -> {}
-        is LocationListState.LocationList -> {
-            LocationList(commonPadding, state, locationListIntent)
-        }
-        is LocationListState.LoadingLocationList -> {
-            LoadingContent()
-        }
-        is LocationListState.EmptyLocationList -> {
-            LocationEmptyScreen()
-        }
-        is LocationListState.RemoveLocation -> {
-            //TODO add android snackbar with the details
-        }
-    }
-
-    Box(modifier = modifier.fillMaxSize()) {
-        FloatingActionButton(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(commonPadding),
-            onClick = { locationListIntent(LocationListViewIntent.OnAddLocationClick) }
-        ) {
-            Icon(Icons.Rounded.Add, contentDescription = "Add Button")
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        containerColor = Color.Transparent,
+        topBar = {
+            WeatherSimpleTopBar(
+                title = stringResource(id = R.string.locations_header),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { locationListIntent(LocationListViewIntent.OnAddLocationClick) }
+            ) {
+                Icon(Icons.Rounded.Add, contentDescription = "Add Button")
+            }
+        },
+        floatingActionButtonPosition = FabPosition.End
+    ) { innerPadding ->
+        when (state) {
+            is LocationListState.LocationChosen -> {}
+            is LocationListState.LocationList -> {
+                LocationList(
+                    state = state,
+                    innerPadding = innerPadding,
+                    locationListIntent = locationListIntent
+                )
+            }
+            is LocationListState.LoadingLocationList -> {
+                ContentLoading()
+            }
+            is LocationListState.EmptyLocationList -> {
+                LocationEmptyScreen()
+            }
+            is LocationListState.RemoveLocation -> {
+                //TODO add android snackbar with the details
+            }
         }
     }
 }
@@ -163,22 +186,23 @@ fun LocationListScreen(
 )
 @Composable
 private fun LocationList(
-    paddingValue: Dp = 4.dp,
     state: LocationListState.LocationList,
+    innerPadding: PaddingValues,
     locationListIntent: (LocationListViewIntent) -> Unit,
 ) {
     LazyColumn(
-        contentPadding = PaddingValues(horizontal = paddingValue, vertical = 8.dp),
+        contentPadding = innerPadding,
+        modifier = Modifier.padding(top = 16.dp)
     ) {
         items(items = state.locations, key = {
             it.hashCode()
         }) { location ->
             AnimatedSwipeDismiss(
                 modifier = Modifier
-                    .padding(vertical = 4.dp)
+                    .padding(vertical = 4.dp, horizontal = 8.dp)
                     .animateItemPlacement(),
                 item = location,
-                background = { isDismissed ->
+                background = { _ ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -197,8 +221,12 @@ private fun LocationList(
                 },
                 content = {
                     LocationItemHolder(locationItem = location, modifier = Modifier.clickable {
-                        locationListIntent(LocationListViewIntent.OnLocationClick)
-                    })
+                        locationListIntent(LocationListViewIntent.OnLocationClick(
+                            location = location.name,
+                            lat = location.lat,
+                            lng = location.lng))
+                    }
+                    )
                 },
                 onDismiss = {
                     locationListIntent(LocationListViewIntent.RemoveLocation(location))
@@ -210,27 +238,6 @@ private fun LocationList(
     }
 }
 
-@Composable
-private fun LoadingContent(
-    modifier: Modifier = Modifier,
-) {
-
-    val wheelSize = 126.dp
-
-    Column(modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        LoadingWheel(
-            modifier = Modifier.size(wheelSize),
-            contentDesc = "Location Loading")
-
-        Text(color = MaterialTheme.colorScheme.onPrimary,
-            modifier = modifier,
-            text = stringResource(id = R.string.loading_wheel_header)
-        )
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LocationItemHolder(
@@ -238,13 +245,38 @@ private fun LocationItemHolder(
     locationItem: LocationItem,
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
-        Column(Modifier.padding(8.dp)) {
-            Text(text = "Location: ${locationItem.name}",
-                style = MaterialTheme.typography.titleLarge)
-            Text(text = "Lat/Lng: ${locationItem.lat} / ${locationItem.lng}",
-                style = MaterialTheme.typography.titleSmall)
-            Text(text = "Publish Date: ${dateFormatted(publishDate = locationItem.publishDate)}",
-                style = MaterialTheme.typography.bodySmall)
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            InfoLabelWithIcon(
+                icon = Icons.Rounded.DateRange,
+                title = dateFormatted(publishDate = locationItem.publishDate)
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 4.dp)
+            ) {
+                Icon(
+                    Icons.Rounded.Place,
+                    contentDescription = "Place",
+                    tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+                )
+
+                Spacer(modifier = Modifier.size(8.dp))
+
+                Text(text = locationItem.name,
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold)
+                )
+            }
+
+            InfoLabelWithIcon(
+                icon = Icons.Rounded.Info,
+                title = "Lat/Lng: ${locationItem.lat} / ${locationItem.lng}",
+            )
         }
     }
 }
@@ -260,25 +292,55 @@ private fun LocationEmptyScreen(
         initialValue = 100.0f,
         targetValue = 120.0f,
         animationSpec = infiniteRepeatable(
-            animation = tween(2500, delayMillis = 100, easing = FastOutLinearInEasing),
+            animation = tween(
+                durationMillis = 2500,
+                delayMillis = 100,
+                easing = FastOutLinearInEasing
+            ),
             repeatMode = RepeatMode.Reverse
         )
     )
 
-    Column(modifier = modifier.fillMaxSize(),
+    Column(
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        Image(modifier = Modifier.size(imgSize.dp),
+        Image(
+            modifier = Modifier.size(imgSize.dp),
             painter = painterResource(id = R.drawable.ic_baseline_location_off),
             contentDescription = stringResource(id = R.string.no_locations_added_header),
             colorFilter = ColorFilter.tint(color = MaterialTheme.colorScheme.secondary)
         )
 
-        Text(color = MaterialTheme.colorScheme.onPrimary,
+        Text(
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = modifier,
             text = stringResource(id = R.string.no_locations_added_header)
+        )
+    }
+}
+
+@Composable
+private fun InfoLabelWithIcon(
+    icon: ImageVector,
+    title: String,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Icon(
+            imageVector = icon,
+            contentDescription = "Publish Date",
+            tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+        )
+
+        Spacer(modifier = Modifier.size(8.dp))
+
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = MaterialTheme.colorScheme.secondary.copy(
+                    alpha = 0.8f)
+            )
         )
     }
 }
@@ -304,45 +366,65 @@ private fun dateFormatted(publishDate: Instant): String {
 }
 
 
-//@Preview
-//@Composable
-//fun LocationListScreenPreview() {
-//    LocationListScreen(state = LocationListState.LocationList(locations = listOf(
-//        LocationItem(
-//            name = "Warsaw", lat = 52.237049, lng = 21.017532,
-//            publishDate = LocalDateTime(
-//                year = 2022,
-//                monthNumber = 5,
-//                dayOfMonth = 4,
-//                hour = 23,
-//                minute = 0,
-//                second = 0,
-//                nanosecond = 0
-//            ).toInstant(TimeZone.UTC),
-//        ),
-//        LocationItem(
-//            name = "Kyiv", lat = 50.450001, lng = 30.523333,
-//            publishDate = LocalDateTime(
-//                year = 2022,
-//                monthNumber = 5,
-//                dayOfMonth = 4,
-//                hour = 23,
-//                minute = 0,
-//                second = 0,
-//                nanosecond = 0
-//            ).toInstant(TimeZone.UTC),
-//        )
-//    )))
-//}
-//
-//@Preview
-//@Composable
-//fun LocationListScreenLoadingPreview() {
-//    LocationListScreen(state = LocationListState.LoadingLocationList)
-//}
-//
-//@Preview
-//@Composable
-//fun LocationEmptyScreenPreview() {
-//    LocationEmptyScreen()
-//}
+@Preview
+@Composable
+fun LocationListScreenPreview() {
+    LocationListScreen(
+        state = LocationListState.LocationList(locations = listOf(
+            LocationItem(
+                name = "Warsaw", lat = 52.237049, lng = 21.017532,
+                publishDate = LocalDateTime(
+                    year = 2022,
+                    monthNumber = 5,
+                    dayOfMonth = 4,
+                    hour = 23,
+                    minute = 0,
+                    second = 0,
+                    nanosecond = 0
+                ).toInstant(TimeZone.UTC),
+            ),
+            LocationItem(
+                name = "Kyiv", lat = 50.450001, lng = 30.523333,
+                publishDate = LocalDateTime(
+                    year = 2022,
+                    monthNumber = 5,
+                    dayOfMonth = 4,
+                    hour = 23,
+                    minute = 0,
+                    second = 0,
+                    nanosecond = 0
+                ).toInstant(TimeZone.UTC),
+            )
+        )))
+}
+
+@Preview
+@Composable
+fun LocationListScreenLoadingPreview() {
+    LocationListScreen(state = LocationListState.LoadingLocationList)
+}
+
+@Preview
+@Composable
+fun LocationEmptyScreenPreview() {
+    LocationEmptyScreen()
+}
+
+@Preview
+@Composable
+fun LocationItemHolderPreview() {
+    LocationItemHolder(
+        locationItem = LocationItem(
+            name = "Kyiv", lat = 50.450001, lng = 30.523333,
+            publishDate = LocalDateTime(
+                year = 2022,
+                monthNumber = 5,
+                dayOfMonth = 4,
+                hour = 23,
+                minute = 0,
+                second = 0,
+                nanosecond = 0
+            ).toInstant(TimeZone.UTC),
+        )
+    )
+}

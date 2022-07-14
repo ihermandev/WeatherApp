@@ -1,4 +1,4 @@
-package i.herman.weatherapp
+package i.herman.weatherapp.locationlist.util
 
 import android.content.BroadcastReceiver
 import android.content.Context

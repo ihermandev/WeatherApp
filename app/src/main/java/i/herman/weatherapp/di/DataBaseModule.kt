@@ -11,6 +11,8 @@ import i.herman.weatherapp.data.local.WeatherDataBase
 import i.herman.weatherapp.data.local.dao.LocationDao
 import javax.inject.Singleton
 
+const val DATABASE_NAME = "weather-database"
+
 @Module
 @InstallIn(SingletonComponent::class)
 object DataBaseModule {
@@ -27,6 +29,6 @@ object DataBaseModule {
     ): WeatherDataBase = Room.databaseBuilder(
         context,
         WeatherDataBase::class.java,
-        "weather-database"
+        DATABASE_NAME
     ).build()
 }

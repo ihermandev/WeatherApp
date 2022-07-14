@@ -10,6 +10,7 @@ import i.herman.weatherapp.locationlist.contract.LocationListStateReducer
 import i.herman.weatherapp.locationlist.contract.LocationListViewIntent
 import i.herman.weatherapp.locationlist.contract.LocationListViewState
 import i.herman.weatherapp.locationlist.model.LocationListState
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -26,6 +27,7 @@ class LocationListViewModel @Inject constructor(
     override fun createInitialState(): LocationListViewState =
         LocationListViewState(state = LocationListState.LoadingLocationList)
 
+    @OptIn(FlowPreview::class)
     override fun Flow<LocationListViewIntent>.handleIntent(): Flow<StateReducer<LocationListViewState>> {
 
         val fetchLocationList =
