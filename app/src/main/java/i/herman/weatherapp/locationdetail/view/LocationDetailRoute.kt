@@ -13,10 +13,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -68,8 +70,14 @@ fun LocationDetailsScreen(
     locationDetailIntent: (LocationDetailViewIntent) -> Unit = {},
 ) {
 
+    val topAppBarScrollState: TopAppBarScrollState = rememberTopAppBarScrollState()
+    val scrollBehavior =
+        remember { TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarScrollState) }
+
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
         topBar = {
             WeatherTopBar(
@@ -79,7 +87,8 @@ fun LocationDetailsScreen(
                 ),
                 navigationIcon = Icons.Rounded.ArrowBack,
                 navigationIconContentDescription = stringResource(id = R.string.arrow_back),
-                onNavigationClick = { locationDetailIntent(LocationDetailViewIntent.OnBackClick) }
+                onNavigationClick = { locationDetailIntent(LocationDetailViewIntent.OnBackClick) },
+                scrollBehavior = scrollBehavior
             )
         }) { innerPadding ->
         when (state) {
@@ -96,7 +105,7 @@ fun LocationDetailsScreen(
                     items(items = state.forecasts) {
                         ForecastItemHolder(
                             item = it,
-                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)
+                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
                         )
                     }
                 }

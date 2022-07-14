@@ -14,11 +14,13 @@ fun WeatherSimpleTopBar(
     title: String?,
     modifier: Modifier = Modifier,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+    scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     CenterAlignedTopAppBar(
         title = { Text(text = title ?: "") },
         colors = colors,
-        modifier = modifier
+        modifier = modifier,
+        scrollBehavior = scrollBehavior
     )
 }
 
@@ -29,6 +31,7 @@ fun WeatherTopBar(
     navigationIconContentDescription: String?,
     modifier: Modifier = Modifier,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+    scrollBehavior: TopAppBarScrollBehavior? = null,
     onNavigationClick: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
@@ -43,7 +46,8 @@ fun WeatherTopBar(
             }
         },
         colors = colors,
-        modifier = modifier
+        modifier = modifier,
+        scrollBehavior = scrollBehavior
     )
 }
 

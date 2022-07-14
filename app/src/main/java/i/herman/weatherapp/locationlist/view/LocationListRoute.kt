@@ -43,12 +43,12 @@ import com.google.android.libraries.places.widget.Autocomplete
 import com.google.android.libraries.places.widget.AutocompleteActivity
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode
 import i.herman.weatherapp.R
-import i.herman.weatherapp.locationlist.util.TimeZoneBroadcastReceiver
 import i.herman.weatherapp.locationlist.contract.LocationListEvent
 import i.herman.weatherapp.locationlist.contract.LocationListViewIntent
 import i.herman.weatherapp.locationlist.contract.LocationListViewState
 import i.herman.weatherapp.locationlist.model.LocationItem
 import i.herman.weatherapp.locationlist.model.LocationListState
+import i.herman.weatherapp.locationlist.util.TimeZoneBroadcastReceiver
 import i.herman.weatherapp.locationlist.util.asExternalModel
 import i.herman.weatherapp.locationlist.viewmodel.LocationListViewModel
 import i.herman.weatherapp.ui.core.AnimatedSwipeDismiss
@@ -136,7 +136,6 @@ fun LocationListScreen(
     state: LocationListState,
     locationListIntent: (LocationListViewIntent) -> Unit = {},
 ) {
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = Color.Transparent,
@@ -191,15 +190,14 @@ private fun LocationList(
     locationListIntent: (LocationListViewIntent) -> Unit,
 ) {
     LazyColumn(
-        contentPadding = innerPadding,
-        modifier = Modifier.padding(top = 16.dp)
+        contentPadding = innerPadding
     ) {
         items(items = state.locations, key = {
             it.hashCode()
         }) { location ->
             AnimatedSwipeDismiss(
                 modifier = Modifier
-                    .padding(vertical = 4.dp, horizontal = 8.dp)
+                    .padding(vertical = 4.dp, horizontal = 4.dp)
                     .animateItemPlacement(),
                 item = location,
                 background = { _ ->
