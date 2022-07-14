@@ -19,7 +19,6 @@ fun WeatherNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: String = "add_location",
 ) {
-
     NavHost(
         navController = navController,
         startDestination = startDestination,
