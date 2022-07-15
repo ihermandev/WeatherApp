@@ -6,7 +6,11 @@ sealed class LocationDetailViewIntent : BaseIntent {
 
     object FetchSevenDaysWeatherForecast : LocationDetailViewIntent()
 
-    object OnWeatherClick : LocationDetailViewIntent()
+    class OnWeatherClick(
+        val date: String,
+        val lat: String,
+        val lng: String,
+    ) : LocationDetailViewIntent()
 
     object OnBackClick : LocationDetailViewIntent()
 }

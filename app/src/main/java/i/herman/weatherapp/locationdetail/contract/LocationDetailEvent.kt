@@ -6,5 +6,9 @@ sealed class LocationDetailEvent : BaseViewEvent {
 
     object OnBackClick : LocationDetailEvent()
 
-    object OnWeatherDetailsClick : LocationDetailEvent()
+    class OnWeatherDetailsClick(
+        val date: String,
+        val lat: String,
+        val lng: String,
+    ) : LocationDetailEvent()
 }

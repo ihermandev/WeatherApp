@@ -4,9 +4,9 @@ import com.google.gson.annotations.SerializedName
 
 data class WeatherDto(
     @SerializedName("daily")
-    val daily: WeatherDataDto,
+    val daily: WeatherBriefDataDto,
     @SerializedName("daily_units")
-    val daily_units: WeatherUnitsDto,
+    val daily_units: WeatherBriefUnitsDto,
     @SerializedName("elevation")
     val elevation: Double,
     @SerializedName("generationtime_ms")

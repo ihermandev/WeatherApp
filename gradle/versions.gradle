@@ -1,6 +1,6 @@
 ext {
     /** SDK **/
-    androidMinSdk = 24
+    androidMinSdk = 26
     androidCompileSdk = 32
     androidTargetSdk = 32
 
