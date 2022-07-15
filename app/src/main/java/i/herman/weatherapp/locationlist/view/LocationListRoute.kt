@@ -200,7 +200,7 @@ private fun LocationList(
                     .padding(vertical = 4.dp, horizontal = 4.dp)
                     .animateItemPlacement(),
                 item = location,
-                background = { _ ->
+                background = {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()

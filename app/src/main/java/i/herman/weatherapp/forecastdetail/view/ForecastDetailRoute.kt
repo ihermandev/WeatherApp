@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import i.herman.weatherapp.R
 import i.herman.weatherapp.forecastdetail.contract.ForecastDetailEvent
+import i.herman.weatherapp.forecastdetail.contract.ForecastDetailViewIntent
 import i.herman.weatherapp.forecastdetail.contract.ForecastDetailViewState
 import i.herman.weatherapp.forecastdetail.model.ForecastDetailState
 import i.herman.weatherapp.forecastdetail.model.asForecastDetailedCurrentItem
@@ -45,7 +46,19 @@ fun ForecastDetailRoute(
 
     val uiState: ForecastDetailViewState by viewModel.viewStateFlow.collectAsState()
 
-    ForecastDetailScreen(state = uiState.state)
+    ForecastDetailScreen(
+        modifier = modifier,
+        state = uiState.state
+    ) { forecastDetailViewIntent ->
+        when (forecastDetailViewIntent) {
+            is ForecastDetailViewIntent.FetchDetailedWeatherData -> {
+
+            }
+            is ForecastDetailViewIntent.OnBackClick -> {
+                onEvent.invoke(ForecastDetailEvent.OnBackClick)
+            }
+        }
+    }
 
 }
 
@@ -53,6 +66,7 @@ fun ForecastDetailRoute(
 private fun ForecastDetailScreen(
     modifier: Modifier = Modifier,
     state: ForecastDetailState,
+    forecastDetailViewIntent: (ForecastDetailViewIntent) -> Unit = {},
 ) {
 
     when (state) {
@@ -96,8 +110,8 @@ private fun ForecastDetailScreen(
                 }
                 item {
                     SunriseSunsetComponent(
-                        sunset = forecastItem.justTime(forecastItem.sunset),
-                        sunrise = forecastItem.justTime(forecastItem.sunrise)
+                        sunset = justTime(forecastItem.sunset),
+                        sunrise = justTime(forecastItem.sunrise)
                     )
                 }
             }

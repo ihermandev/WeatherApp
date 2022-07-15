@@ -27,7 +27,7 @@ fun WeatherNavHost(
         modifier = modifier
     ) {
         composable(route = "add_location") {
-            LocationListRoute() { locationListEvent ->
+            LocationListRoute { locationListEvent ->
                 when (locationListEvent) {
                     is LocationListEvent.OnLocationDetailsClick -> {
                         navController.navigate("location_details" +
@@ -46,7 +46,7 @@ fun WeatherNavHost(
                 navArgument("lng") { type = NavType.StringType },
             )
         ) {
-            LocationDetailsRoute() { locationDetailEvent ->
+            LocationDetailsRoute { locationDetailEvent ->
                 when (locationDetailEvent) {
                     is LocationDetailEvent.OnWeatherDetailsClick -> {
                         navController.navigate("forecast_details" +
@@ -66,7 +66,7 @@ fun WeatherNavHost(
                 navArgument("lng") { type = NavType.StringType },
             )
         ) {
-            ForecastDetailRoute() { forecastDetailEvent ->
+            ForecastDetailRoute { forecastDetailEvent ->
                 when (forecastDetailEvent) {
                     is ForecastDetailEvent.OnBackClick -> navController.popBackStack()
                 }
