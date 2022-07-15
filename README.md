@@ -1,3 +1,6 @@
+# Setup
+In order to build the project GOOGLE_PLACES_API_KEY is required
+
 ## Functionality 
 Application should contain following screens: 
 - Weather forecast
@@ -23,3 +26,9 @@ Application should contain following screens:
   - Pressure 
   - UV index 
   - Sunrise and sunset time
+
+### Demo
+
+https://user-images.githubusercontent.com/25265967/179311120-e7b9950c-96ea-454c-ad7a-2308e277f11d.mp4
+
+

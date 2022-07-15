@@ -12,6 +12,7 @@ import i.herman.weatherapp.forecastdetail.contract.ForecastDetailStateReducer
 import i.herman.weatherapp.forecastdetail.contract.ForecastDetailViewIntent
 import i.herman.weatherapp.forecastdetail.contract.ForecastDetailViewState
 import i.herman.weatherapp.forecastdetail.model.ForecastDetailState
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -21,7 +22,7 @@ class ForecastDetailViewModel @Inject constructor(
     val repository: WeatherRepository,
 ) : BaseViewModel<ForecastDetailViewState, ForecastDetailViewIntent, ForecastDetailEvent>() {
 
-    val date: String = checkNotNull(savedStateHandle["date"])
+    private val date: String = checkNotNull(savedStateHandle["date"])
     val lat: String = checkNotNull(savedStateHandle["lat"])
     val lng: String = checkNotNull(savedStateHandle["lng"])
 
@@ -32,6 +33,7 @@ class ForecastDetailViewModel @Inject constructor(
     override fun createInitialState(): ForecastDetailViewState =
         ForecastDetailViewState(state = ForecastDetailState.LoadingForecast)
 
+    @OptIn(FlowPreview::class)
     override fun Flow<ForecastDetailViewIntent>.handleIntent(): Flow<StateReducer<ForecastDetailViewState>> {
 
         val fetchWeatherDetails =

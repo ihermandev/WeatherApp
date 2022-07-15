@@ -31,8 +31,7 @@ data class ForecastDetailedCurrentItem(
 
 fun ForecastDetailedItem.asListOfTime(): List<String> = time.map { it.substringAfter("T") }
 
-fun ForecastDetailedItem.justTime(date: String): String = date.substringAfter("T")
-
+fun justTime(date: String): String = date.substringAfter("T")
 
 fun ForecastDetailedItem.asForecastDetailedCurrentItem(): ForecastDetailedCurrentItem {
     val now = LocalDateTime.now()
