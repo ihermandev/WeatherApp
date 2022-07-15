@@ -8,6 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import i.herman.weatherapp.forecastdetail.contract.ForecastDetailEvent
+import i.herman.weatherapp.forecastdetail.view.ForecastDetailRoute
 import i.herman.weatherapp.locationdetail.contract.LocationDetailEvent
 import i.herman.weatherapp.locationdetail.view.LocationDetailsRoute
 import i.herman.weatherapp.locationlist.contract.LocationListEvent
@@ -47,9 +49,26 @@ fun WeatherNavHost(
             LocationDetailsRoute() { locationDetailEvent ->
                 when (locationDetailEvent) {
                     is LocationDetailEvent.OnWeatherDetailsClick -> {
-
+                        navController.navigate("forecast_details" +
+                                "/${locationDetailEvent.date}" +
+                                "/${locationDetailEvent.lat}" +
+                                "/${locationDetailEvent.lng}")
                     }
                     is LocationDetailEvent.OnBackClick -> navController.popBackStack()
+                }
+            }
+        }
+        composable(
+            route = "forecast_details/{date}/{lat}/{lng}",
+            arguments = listOf(
+                navArgument("date") { type = NavType.StringType },
+                navArgument("lat") { type = NavType.StringType },
+                navArgument("lng") { type = NavType.StringType },
+            )
+        ) {
+            ForecastDetailRoute() { forecastDetailEvent ->
+                when (forecastDetailEvent) {
+                    is ForecastDetailEvent.OnBackClick -> navController.popBackStack()
                 }
             }
         }

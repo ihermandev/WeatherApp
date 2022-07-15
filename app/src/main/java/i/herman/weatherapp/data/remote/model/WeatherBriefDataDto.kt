@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 import i.herman.weatherapp.locationdetail.model.ForecastItem
 import i.herman.weatherapp.locationdetail.model.WeatherType
 
-data class WeatherDataDto(
+data class WeatherBriefDataDto(
     @SerializedName("time")
     val timeList: List<String>,
     @SerializedName("temperature_2m_max")
@@ -15,7 +15,7 @@ data class WeatherDataDto(
     val weatherCodeList: List<Double>,
 )
 
-fun WeatherDataDto.toForecastItemList(): List<ForecastItem> {
+fun WeatherBriefDataDto.asForecastItemList(): List<ForecastItem> {
     return timeList.mapIndexed { index, time ->
         val temperatureMax = temperatureMaxList[index]
         val temperatureMin = temperatureMinList[index]

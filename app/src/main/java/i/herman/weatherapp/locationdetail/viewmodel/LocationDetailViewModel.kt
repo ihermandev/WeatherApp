@@ -5,7 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import i.herman.weatherapp.base.BaseViewModel
 import i.herman.weatherapp.base.StateReducer
 import i.herman.weatherapp.data.Response
-import i.herman.weatherapp.data.remote.model.toForecastItemList
+import i.herman.weatherapp.data.remote.model.asForecastItemList
 import i.herman.weatherapp.data.repository.WeatherRepository
 import i.herman.weatherapp.locationdetail.contract.LocationDetailEvent
 import i.herman.weatherapp.locationdetail.contract.LocationDetailStateReducer
@@ -23,8 +23,8 @@ class LocationDetailViewModel @Inject constructor(
 ) : BaseViewModel<LocationDetailViewState, LocationDetailViewIntent, LocationDetailEvent>() {
 
     val locationName: String = checkNotNull(savedStateHandle["location"])
-    private val lat: String = checkNotNull(savedStateHandle["lat"])
-    private val lng: String = checkNotNull(savedStateHandle["lng"])
+    val lat: String = checkNotNull(savedStateHandle["lat"])
+    val lng: String = checkNotNull(savedStateHandle["lng"])
 
     init {
         processIntent(LocationDetailViewIntent.FetchSevenDaysWeatherForecast)
@@ -43,7 +43,7 @@ class LocationDetailViewModel @Inject constructor(
                         .map { response ->
                             when (response) {
                                 is Response.Success -> {
-                                    LocationDetailStateReducer.LoadedForecastList(response.data.daily.toForecastItemList())
+                                    LocationDetailStateReducer.LoadedForecastList(response.data.daily.asForecastItemList())
                                 }
                                 is Response.Error -> {
                                     //TODO handle error

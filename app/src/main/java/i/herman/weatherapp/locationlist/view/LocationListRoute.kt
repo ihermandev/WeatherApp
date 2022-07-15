@@ -131,7 +131,7 @@ fun LocationListRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationListScreen(
+private fun LocationListScreen(
     modifier: Modifier = Modifier,
     state: LocationListState,
     locationListIntent: (LocationListViewIntent) -> Unit = {},

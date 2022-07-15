@@ -1,6 +1,7 @@
 package i.herman.weatherapp.locationdetail.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -47,6 +48,8 @@ fun LocationDetailsRoute(
     LocationDetailsScreen(
         modifier = modifier,
         topBarTitle = viewModel.locationName,
+        latitude = viewModel.lat,
+        longitude = viewModel.lng,
         state = uiState.state,
         locationDetailIntent = { locationDetailIntent ->
             when (locationDetailIntent) {
@@ -54,7 +57,14 @@ fun LocationDetailsRoute(
                 is LocationDetailViewIntent.OnBackClick -> {
                     onEvent.invoke(LocationDetailEvent.OnBackClick)
                 }
-                is LocationDetailViewIntent.OnWeatherClick -> {}
+                is LocationDetailViewIntent.OnWeatherClick -> {
+                    onEvent.invoke(LocationDetailEvent.OnWeatherDetailsClick(
+                        date = locationDetailIntent.date,
+                        lat = locationDetailIntent.lat,
+                        lng = locationDetailIntent.lng
+                    )
+                    )
+                }
             }
         }
     )
@@ -63,9 +73,11 @@ fun LocationDetailsRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationDetailsScreen(
+private fun LocationDetailsScreen(
     modifier: Modifier = Modifier,
     topBarTitle: String = "",
+    latitude: String = "",
+    longitude: String = "",
     state: LocationDetailState,
     locationDetailIntent: (LocationDetailViewIntent) -> Unit = {},
 ) {
@@ -102,10 +114,18 @@ fun LocationDetailsScreen(
                     modifier = modifier.padding(top = 16.dp),
                     contentPadding = innerPadding
                 ) {
-                    items(items = state.forecasts) {
+                    items(items = state.forecasts) { item ->
                         ForecastItemHolder(
-                            item = it,
-                            modifier = Modifier.padding(vertical = 8.dp, horizontal = 8.dp)
+                            item = item,
+                            modifier = Modifier
+                                .padding(vertical = 8.dp, horizontal = 8.dp)
+                                .clickable {
+                                    locationDetailIntent(LocationDetailViewIntent.OnWeatherClick(
+                                        date = item.time,
+                                        lat = latitude,
+                                        lng = longitude
+                                    ))
+                                }
                         )
                     }
                 }
@@ -115,8 +135,6 @@ fun LocationDetailsScreen(
             }
         }
     }
-
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
