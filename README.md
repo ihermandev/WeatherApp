@@ -1,3 +1,6 @@
+# Setup
+In order to build the project GOOGLE_PLACES_API_KEY is required
+
 ## Functionality 
 Application should contain following screens: 
 - Weather forecast
