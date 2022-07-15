@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+    //Location List Screen
+    <string name="no_locations_added_header" translatable="false">"No available data"</string>
+    <string name="loading_wheel_header" translatable="false">"Loading…"</string>
+    <string name="locations_header" translatable="false">"Locations"</string>
+    <string name="arrow_back" translatable="false">"Back"</string>
 </resources>

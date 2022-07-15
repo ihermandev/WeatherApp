@@ -3,17 +3,35 @@ plugins {
     id 'dagger.hilt.android.plugin'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'kotlin-parcelize'
+}
+
+apply from: "$rootDir/gradle/versions.gradle"
+
+def properties = new Properties()
+def propertiesFile = rootProject.file('local.properties')
+
+if (propertiesFile.exists()) {
+    propertiesFile.withReader('UTF-8') { reader ->
+        properties.load(reader)
+    }
+} else {
+    throw new GradleException("local.properties file not found.")
+}
+
+if (properties['GOOGLE_PLACES_API_KEY'] == null) {
+    throw new GradleException("GOOGLE_PLACES_API_KEY not found.")
 }
 
 android {
-    compileSdk 32
+    compileSdkVersion androidCompileSdk
 
     defaultConfig {
         applicationId "i.herman.weatherapp"
-        minSdk 24
-        targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion androidMinSdk
+        targetSdkVersion androidTargetSdk
+        versionCode versionCode
+        versionName versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -23,8 +41,19 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            buildConfigField "String", "GOOGLE_PLACES_API_KEY", '"' + properties.getProperty("GOOGLE_PLACES_API_KEY") + '"'
+            buildConfigField "String", "OPEN_METEO_URL", '"https://api.open-meteo.com/"'
+
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            buildConfigField "String", "GOOGLE_PLACES_API_KEY", '"' + properties.getProperty("GOOGLE_PLACES_API_KEY") + '"'
+            buildConfigField "String", "OPEN_METEO_URL", '"https://api.open-meteo.com/"'
+
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
@@ -33,12 +62,16 @@ android {
     }
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
+
+        freeCompilerArgs +=[
+                '-Xopt-in=kotlin.RequiresOptIn'
+        ]
     }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion compose_version
+        kotlinCompilerExtensionVersion composeVersion
     }
     packagingOptions {
         resources {
@@ -49,106 +82,86 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.activity:activity-compose:1.4.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.appcompat:appcompat:1.4.2'
-    implementation 'com.google.android.material:material:1.5.0-alpha04'
+    //Android
+    implementation "androidx.core:core-ktx:$androidxCoreKtxVersion"
+    implementation "androidx.activity:activity-compose:$androidxActivityComposeVersion"
+    implementation "androidx.legacy:legacy-support-v4:$androidxLegacyVersion"
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "com.google.android.material:material:$materialVersion"
 
-    // Lifecycle
-    def lifecycle_version = "2.4.1"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    //Lifecycle
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
 
-    // Fragment features
-    implementation "androidx.fragment:fragment-ktx:1.4.1"
+    //Navigation
+    implementation "androidx.navigation:navigation-compose:$navVersion"
 
-    // Navigation
-    def nav_version = "2.4.2"
-    implementation "androidx.navigation:navigation-compose:$nav_version"
-    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    //Google Places api
+    implementation "com.google.android.libraries.places:places:$googlePlacesVersion"
 
-    // Compose
-    implementation "androidx.compose.ui:ui:$compose_version"
-    implementation("androidx.compose.foundation:foundation:$compose_version") {
-        because 'Foundation (Border, Background, Box, Image, Scroll, shapes, animations, etc.)'
-    }
-    implementation 'androidx.compose.material3:material3:1.0.0-alpha13'
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation("androidx.compose.ui:ui-tooling:$compose_version") {
-        because 'Tooling support (Previews, etc.)'
-    }
+    // KotlinX Date Time
+    implementation "org.jetbrains.kotlinx:kotlinx-datetime:$kotlinxDateTimeVersion"
+
+    //Room
+    implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
+
+    //Compose
+    implementation "androidx.compose.ui:ui:$composeVersion"
+    implementation("androidx.compose.foundation:foundation:$composeVersion")
+    implementation "androidx.compose.material3:material3:$composeMaterialVeraion"
+    implementation "androidx.compose.material:material:$composeVersion"
+    implementation "androidx.compose.ui:ui-tooling-preview:$composeVersion"
+    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
+    implementation("androidx.compose.runtime:runtime:$composeVersion")
 
     // Coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
 
     // Hilt - Dependency injection
-    implementation "com.google.dagger:hilt-android:2.42"
-    kapt "com.google.dagger:hilt-compiler:2.42"
+    implementation "com.google.dagger:hilt-android:$hiltVersion"
+    implementation "androidx.hilt:hilt-navigation-compose:$hiltNavigationComposeVersion"
+    kapt "com.google.dagger:hilt-compiler:$hiltVersion"
 
     // JavaX Inject
-    implementation "javax.inject:javax.inject:1"
-
-    // Moshi - JSON parser
-    implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
-    implementation "com.squareup.moshi:moshi-adapters:1.13.0"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.13.0"
-
-    // OkHTTP with logging
-    implementation "com.squareup.okhttp3:okhttp:4.9.3"
-    implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
+    implementation "javax.inject:javax.inject:$javaxInjectVersion"
 
     // Retrofit - HTTP Request manager
-    implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
-    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
 
+    // OkHTTP with logging
+    implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
+
+    //Gson
+    implementation "com.google.code.gson:gson:$gsonVersion"
 
     // Locally tests
     // JUnit
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation "junit:junit:$jUnitVerstion"
 
     // Mocking
-    testImplementation 'org.mockito:mockito-core:4.1.0'
-    testImplementation "io.mockk:mockk:1.12.3"
-    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockitoKotlinVersion"
 
     // Assertions
-    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.6.21"
-    testImplementation "com.google.truth:truth:1.1.3"
-    testImplementation 'io.kotest:kotest-assertions-core:5.0.0'
-    testImplementation 'io.kotest:kotest-property:5.0.0'
-    testImplementation "io.strikt:strikt-core:0.33.0"
-    testImplementation 'org.assertj:assertj-core:3.21.0'
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion"
+    testImplementation "com.shazam:shazamcrest:$shazamcrestVersion"
 
     // Testing coroutines & flows
-    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1"
-    testImplementation 'app.cash.turbine:turbine:0.8.0'
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
 
     // Instrumentation tests
-    // Mocking
-    androidTestImplementation 'org.mockito:mockito-android:4.1.0'
-    androidTestImplementation "io.mockk:mockk-android:1.12.3"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
-
-    // Assertions
-    androidTestImplementation "org.jetbrains.kotlin:kotlin-test-junit:1.6.21"
-    androidTestImplementation "com.google.truth:truth:1.1.3"
-    androidTestImplementation 'io.kotest:kotest-assertions-core:5.0.0'
-    androidTestImplementation 'io.kotest:kotest-property:5.0.0'
-    androidTestImplementation "io.strikt:strikt-core:0.33.0"
-    androidTestImplementation 'org.assertj:assertj-core:3.21.0'
+    androidTestImplementation "androidx.test.ext:junit:$jUnitExtVersion"
 
     // Testing coroutines & flows
-    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1"
-    androidTestImplementation 'app.cash.turbine:turbine:0.8.0'
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
 
     // Espresso & Compose testing
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+    androidTestImplementation "androidx.test.ext:junit:$jUnitExtVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoCoreVersion"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4:$composeVersion"
 }
