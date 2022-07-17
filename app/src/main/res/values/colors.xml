@@ -7,4 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!--UV index scheme-->
+    <color name="uv_index_low">#279309</color>
+    <color name="uv_index_moderate">#EAB701</color>
+    <color name="uv_index_high">#E4791C</color>
+    <color name="uv_index_very_high">#AC0F0F</color>
+    <color name="uv_index_extreme">#530DA5</color>
 </resources>

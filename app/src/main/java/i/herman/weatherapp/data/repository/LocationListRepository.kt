@@ -1,6 +1,6 @@
 package i.herman.weatherapp.data.repository
 
-import i.herman.weatherapp.locationlist.model.LocationItem
+import i.herman.weatherapp.feature.locationlist.model.LocationItem
 import kotlinx.coroutines.flow.Flow
 
 interface LocationListRepository {

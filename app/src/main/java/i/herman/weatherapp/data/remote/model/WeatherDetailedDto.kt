@@ -1,8 +1,9 @@
 package i.herman.weatherapp.data.remote.model
 
 import com.google.gson.annotations.SerializedName
-import i.herman.weatherapp.forecastdetail.model.ForecastDetailedItem
-import i.herman.weatherapp.locationdetail.model.WeatherType
+import i.herman.weatherapp.feature.forecastdetail.model.ForecastDetailedItem
+import i.herman.weatherapp.feature.forecastdetail.model.UvIndex
+import i.herman.weatherapp.feature.locationdetail.model.WeatherType
 
 data class WeatherDetailedDto(
     @SerializedName("daily")
@@ -31,7 +32,8 @@ fun WeatherDetailedDto.asForecastDetailedItem(date: String): ForecastDetailedIte
 
     val time = hourlyIndexes.map { hourly.time[it.index] }
     val apparentTemperature = hourlyIndexes.map { hourly.apparentTemperature[it.index] }
-    val radiation = hourlyIndexes.map { hourly.directRadiation[it.index] }
+    val radiation =
+        hourlyIndexes.map { UvIndex.fromValue(hourly.directRadiation[it.index].toInt()) }
     val pressure = hourlyIndexes.map { hourly.surfacePressure[it.index] }
     val temperature = hourlyIndexes.map { hourly.temperature2m[it.index] }
     val humidity = hourlyIndexes.map { hourly.relativeHumidity2m[it.index] }
