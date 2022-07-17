@@ -15,7 +15,7 @@ data class ForecastDetailedItem(
     val temperature: List<Double>,
     val surfacePressure: List<Double>,
     val relativeHumidity: List<Double>,
-    val directRadiation: List<Double>,
+    val directRadiation: List<UvIndex>,
     val weatherTypeHourly: List<WeatherType>,
 )
 
@@ -25,8 +25,8 @@ data class ForecastDetailedCurrentItem(
     val temperature: Double,
     val pressure: Double,
     val humidity: Double,
-    val radiation: Double,
     val weatherType: WeatherType,
+    val uvIndex: UvIndex,
 )
 
 fun ForecastDetailedItem.asListOfTime(): List<String> = time.map { it.substringAfter("T") }
@@ -42,7 +42,7 @@ fun ForecastDetailedItem.asForecastDetailedCurrentItem(): ForecastDetailedCurren
         temperature = temperature[currentHour],
         pressure = surfacePressure[currentHour],
         humidity = relativeHumidity[currentHour],
-        radiation = directRadiation[currentHour],
+        uvIndex = directRadiation[currentHour],
         weatherType = weatherTypeHourly[currentHour],
     )
 }

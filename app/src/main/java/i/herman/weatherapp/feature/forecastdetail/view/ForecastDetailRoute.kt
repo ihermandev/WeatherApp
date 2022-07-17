@@ -16,7 +16,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -29,10 +31,7 @@ import i.herman.weatherapp.R
 import i.herman.weatherapp.feature.forecastdetail.contract.ForecastDetailEvent
 import i.herman.weatherapp.feature.forecastdetail.contract.ForecastDetailViewIntent
 import i.herman.weatherapp.feature.forecastdetail.contract.ForecastDetailViewState
-import i.herman.weatherapp.feature.forecastdetail.model.ForecastDetailState
-import i.herman.weatherapp.feature.forecastdetail.model.asForecastDetailedCurrentItem
-import i.herman.weatherapp.feature.forecastdetail.model.asListOfTime
-import i.herman.weatherapp.feature.forecastdetail.model.justTime
+import i.herman.weatherapp.feature.forecastdetail.model.*
 import i.herman.weatherapp.feature.forecastdetail.viewmodel.ForecastDetailViewModel
 import i.herman.weatherapp.feature.locationdetail.model.WeatherType
 import i.herman.weatherapp.ui.core.ContentLoading
@@ -84,7 +83,7 @@ private fun ForecastDetailScreen(
 
             LazyColumn(modifier = modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(8.dp)
             ) {
                 item {
                     BriefForecastComponent(
@@ -99,7 +98,8 @@ private fun ForecastDetailScreen(
                 }
                 item { Spacer(modifier = Modifier.height(24.dp)) }
                 item {
-                    HourlyForecastComponent(
+                    HourlyForecastTempComponent(
+                        title = "Hourly Forecast",
                         time = forecastItem.asListOfTime(),
                         weatherType = forecastItem.weatherTypeHourly,
                         temperature = forecastItem.temperature
@@ -114,6 +114,48 @@ private fun ForecastDetailScreen(
                         sunrise = justTime(forecastItem.sunrise)
                     )
                 }
+                item { Spacer(modifier = Modifier.height(24.dp)) }
+                item {
+                    HourlyForecastCommonComponent(
+                        time = forecastItem.asListOfTime(),
+                        value = forecastItem.apparentTemperature,
+                        iconVector = ImageVector.vectorResource(id = R.drawable.ic_forecast_real_feel),
+                        iconDesc = "Real Feel Temperature",
+                        unit = "°C",
+                        title = "Hourly Real Feel",
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(24.dp)) }
+                item {
+                    HourlyForecastCommonComponent(
+                        time = forecastItem.asListOfTime(),
+                        value = forecastItem.relativeHumidity,
+                        iconVector = ImageVector.vectorResource(id = R.drawable.ic_forecast_humidity),
+                        iconDesc = "Humidity",
+                        unit = "%",
+                        title = "Hourly Humidity",
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(24.dp)) }
+                item {
+                    HourlyForecastCommonComponent(
+                        time = forecastItem.asListOfTime(),
+                        value = forecastItem.surfacePressure,
+                        iconVector = ImageVector.vectorResource(id = R.drawable.ic_forecast_pressure),
+                        iconDesc = "Pressure",
+                        unit = "hpa",
+                        title = "Hourly Pressure",
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(24.dp)) }
+                item {
+                    HourlyForecastRadiationComponent(
+                        time = forecastItem.asListOfTime(),
+                        uvType = forecastItem.directRadiation,
+                        title = "UV index"
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(24.dp)) }
             }
         }
     }
@@ -260,15 +302,16 @@ fun SunriseSunsetComponent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HourlyForecastComponent(
+fun HourlyForecastTempComponent(
     modifier: Modifier = Modifier,
+    title: String,
     time: List<String>,
     weatherType: List<WeatherType>,
     temperature: List<Double>,
 ) {
 
     Card(modifier = modifier.fillMaxWidth()) {
-        Text(text = "Hourly Forecast",
+        Text(text = title,
             modifier = Modifier.padding(8.dp),
             style = MaterialTheme.typography.titleSmall.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(
@@ -281,10 +324,85 @@ fun HourlyForecastComponent(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             itemsIndexed(time) { index: Int, item: String ->
-                ForecastHourlyTempDisplay(
+                ForecastHourlyItemDisplay(
                     time = item,
-                    temperature = temperature[index],
-                    weatherType = weatherType[index]
+                    value = temperature[index],
+                    unit = "°C",
+                    icon = painterResource(id = weatherType[index].weatherIcon),
+                    iconDesc = weatherType[index].weatherDescription
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HourlyForecastRadiationComponent(
+    modifier: Modifier = Modifier,
+    title: String,
+    time: List<String>,
+    uvType: List<UvIndex>,
+) {
+
+    Card(modifier = modifier.fillMaxWidth()) {
+        Text(text = title,
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = MaterialTheme.colorScheme.onSurface.copy(
+                    alpha = 0.9f)
+            )
+        )
+
+        LazyRow(
+            contentPadding = PaddingValues(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(time) { index: Int, item: String ->
+                ForecastHourlyUvIndexDisplay(
+                    time = item,
+                    value = uvType[index].uvDescription,
+                    icon = ImageVector.vectorResource(uvType[index].icon),
+                    iconDesc = uvType[index].uvDescription,
+                    iconTint = colorResource(id = uvType[index].iconTint)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HourlyForecastCommonComponent(
+    modifier: Modifier = Modifier,
+    title: String,
+    time: List<String>,
+    iconVector: ImageVector,
+    iconDesc: String? = null,
+    value: List<Double>,
+    unit: String,
+) {
+
+    Card(modifier = modifier.fillMaxWidth()) {
+        Text(text = title,
+            modifier = Modifier.padding(8.dp),
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = MaterialTheme.colorScheme.onSurface.copy(
+                    alpha = 0.9f)
+            )
+        )
+
+        LazyRow(
+            contentPadding = PaddingValues(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            itemsIndexed(time) { index: Int, item: String ->
+                ForecastHourlyItemDisplay(
+                    time = item,
+                    value = value[index],
+                    unit = unit,
+                    icon = iconVector,
+                    iconDesc = iconDesc
                 )
             }
         }
@@ -292,11 +410,14 @@ fun HourlyForecastComponent(
 }
 
 @Composable
-fun ForecastHourlyTempDisplay(
+fun ForecastHourlyItemDisplay(
     modifier: Modifier = Modifier,
     time: String,
-    temperature: Double,
-    weatherType: WeatherType,
+    value: Double,
+    unit: String,
+    icon: Painter,
+    iconDesc: String? = null,
+    iconSize: Dp = 36.dp,
     textColorTop: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
     textColorBottom: Color = MaterialTheme.colorScheme.onSurface,
 ) {
@@ -310,17 +431,95 @@ fun ForecastHourlyTempDisplay(
             color = textColorTop
         )
         Image(
-            painter = painterResource(id = weatherType.weatherIcon),
-            contentDescription = weatherType.weatherDescription,
-            modifier = Modifier.size(36.dp)
+            painter = icon,
+            contentDescription = iconDesc,
+            modifier = Modifier
+                .size(iconSize)
+                .padding(vertical = 4.dp)
         )
         Text(
-            text = "$temperature °C",
+            text = "$value $unit",
             color = textColorBottom,
             fontWeight = FontWeight.Bold
         )
     }
 }
+
+@Composable
+fun ForecastHourlyItemDisplay(
+    modifier: Modifier = Modifier,
+    time: String,
+    value: Double,
+    unit: String,
+    icon: ImageVector,
+    iconDesc: String? = null,
+    iconSize: Dp = 36.dp,
+    iconTint: Color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f),
+    textColorTop: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+    textColorBottom: Color = MaterialTheme.colorScheme.onSurface,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = time,
+            color = textColorTop
+        )
+        Icon(
+            imageVector = icon,
+            tint = iconTint,
+            contentDescription = iconDesc,
+            modifier = Modifier
+                .size(iconSize)
+                .padding(vertical = 4.dp)
+        )
+        Text(
+            text = "$value $unit",
+            color = textColorBottom,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+fun ForecastHourlyUvIndexDisplay(
+    modifier: Modifier = Modifier,
+    time: String,
+    value: String,
+    icon: ImageVector,
+    iconDesc: String? = null,
+    iconSize: Dp = 36.dp,
+    iconTint: Color = MaterialTheme.colorScheme.secondary,
+    textColorTop: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+    textColorBottom: Color = MaterialTheme.colorScheme.onSurface,
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = time,
+            color = textColorTop
+        )
+        Icon(
+            imageVector = icon,
+            tint = iconTint.copy(alpha = 0.7f),
+            contentDescription = iconDesc,
+            modifier = Modifier
+                .size(iconSize)
+                .padding(vertical = 4.dp)
+        )
+        Text(
+            text = value,
+            color = textColorBottom,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
 
 @Composable
 fun ForecastItemDisplay(
@@ -410,18 +609,20 @@ fun ForecastItemDisplayVerticallyPreview() {
 
 @Preview
 @Composable
-fun ForecastHourlyTempDisplay() {
-    ForecastHourlyTempDisplay(
+fun ForecastHourlyTempDisplayPreview() {
+    ForecastHourlyItemDisplay(
         time = "19:00",
-        temperature = 21.3,
-        weatherType = WeatherType.Cloudy
+        value = 21.3,
+        icon = painterResource(id = WeatherType.Cloudy.weatherIcon),
+        unit = "°C"
     )
 }
 
 @Preview
 @Composable
 fun HourlyForecastComponentPreview() {
-    HourlyForecastComponent(
+    HourlyForecastTempComponent(
+        title = "Hourly Forecast",
         time = listOf("19:00", "08:00", "00:00", "10:00", "21:00"),
         temperature = listOf(21.3, 12.3, 21.5, 22.3, 21.3),
         weatherType = listOf(

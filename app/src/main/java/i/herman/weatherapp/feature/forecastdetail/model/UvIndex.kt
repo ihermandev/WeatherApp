@@ -1,12 +1,41 @@
 package i.herman.weatherapp.feature.forecastdetail.model
 
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import i.herman.weatherapp.R
+
 //TODO replace with a real measurement
-sealed class UvIndex {
-    object Low : UvIndex()
-    object Moderate : UvIndex()
-    object High : UvIndex()
-    object VeryHigh : UvIndex()
-    object Extreme : UvIndex()
+sealed class UvIndex(
+    val uvDescription: String,
+    @DrawableRes
+    val icon: Int = R.drawable.ic_forecast_uv_index,
+    @ColorRes
+    val iconTint: Int,
+) {
+    object Low : UvIndex(
+        uvDescription = "Low",
+        iconTint = R.color.uv_index_low
+    )
+
+    object Moderate : UvIndex(
+        uvDescription = "Moderate",
+        iconTint = R.color.uv_index_moderate
+    )
+
+    object High : UvIndex(
+        uvDescription = "High",
+        iconTint = R.color.uv_index_high
+    )
+
+    object VeryHigh : UvIndex(
+        uvDescription = "Very High",
+        iconTint = R.color.uv_index_very_high
+    )
+
+    object Extreme : UvIndex(
+        uvDescription = "Extremely High",
+        iconTint = R.color.uv_index_extreme
+    )
 
     companion object {
         fun fromValue(value: Int): UvIndex {
