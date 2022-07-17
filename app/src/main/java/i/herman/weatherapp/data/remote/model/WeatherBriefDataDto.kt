@@ -1,8 +1,8 @@
 package i.herman.weatherapp.data.remote.model
 
 import com.google.gson.annotations.SerializedName
-import i.herman.weatherapp.locationdetail.model.ForecastItem
-import i.herman.weatherapp.locationdetail.model.WeatherType
+import i.herman.weatherapp.feature.locationdetail.model.ForecastItem
+import i.herman.weatherapp.feature.locationdetail.model.WeatherType
 
 data class WeatherBriefDataDto(
     @SerializedName("time")

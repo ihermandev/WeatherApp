@@ -8,12 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import i.herman.weatherapp.forecastdetail.contract.ForecastDetailEvent
-import i.herman.weatherapp.forecastdetail.view.ForecastDetailRoute
-import i.herman.weatherapp.locationdetail.contract.LocationDetailEvent
-import i.herman.weatherapp.locationdetail.view.LocationDetailsRoute
-import i.herman.weatherapp.locationlist.contract.LocationListEvent
-import i.herman.weatherapp.locationlist.view.LocationListRoute
+import i.herman.weatherapp.feature.forecastdetail.contract.ForecastDetailEvent
+import i.herman.weatherapp.feature.forecastdetail.view.ForecastDetailRoute
+import i.herman.weatherapp.feature.locationdetail.contract.LocationDetailEvent
+import i.herman.weatherapp.feature.locationdetail.view.LocationDetailsRoute
+import i.herman.weatherapp.feature.locationlist.contract.LocationListEvent
+import i.herman.weatherapp.feature.locationlist.view.LocationListRoute
 
 @Composable
 fun WeatherNavHost(
