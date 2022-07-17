@@ -29,6 +29,6 @@ Application should contain following screens:
 
 ### Demo
 
-https://user-images.githubusercontent.com/25265967/179311120-e7b9950c-96ea-454c-ad7a-2308e277f11d.mp4
+https://user-images.githubusercontent.com/25265967/179420588-14719e46-5fb3-4d40-a610-4303603f31f5.mp4
 
 
