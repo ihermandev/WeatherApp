@@ -3,7 +3,7 @@ package i.herman.weatherapp.data.local.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import i.herman.weatherapp.locationlist.model.LocationItem
+import i.herman.weatherapp.feature.locationlist.model.LocationItem
 import kotlinx.datetime.Instant
 
 @Entity(tableName = "location_table")

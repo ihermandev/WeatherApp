@@ -3,8 +3,8 @@ package i.herman.weatherapp.data.repository
 import i.herman.weatherapp.data.local.dao.LocationDao
 import i.herman.weatherapp.data.local.model.LocationEntity
 import i.herman.weatherapp.data.local.model.asExternalModel
-import i.herman.weatherapp.locationlist.model.LocationItem
-import i.herman.weatherapp.locationlist.model.asEntityModel
+import i.herman.weatherapp.feature.locationlist.model.LocationItem
+import i.herman.weatherapp.feature.locationlist.model.asEntityModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
