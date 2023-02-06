@@ -29,6 +29,28 @@ abstract class BaseViewModel<VS : BaseViewState, VI : BaseIntent, VE : BaseViewE
             initialValue = initialState
         )
 
+    init {
+        launchViewIntent()
+    }
+
+    /**
+     * Launches the `viewIntentFlow` and performs the following operations:
+     * 1. Handles the intent using the `handleIntent` method.
+     * 2. Dispatches the view event obtained from the `getViewEventFromStateReducer` method.
+     * 3. Scans the initial state and updates the view state with the changes obtained from [StateReducer].
+     * 4. Sets the updated state using the `setState` method.
+     *
+     * The flow is launched in the `viewModelScope`.
+     */
+    private fun launchViewIntent() =
+        viewIntentFlow
+            .handleIntent()
+            .onEach { getViewEventFromStateReducer(it)?.let(::dispatchEvent) }
+            .scan(initialState) { viewState, change -> change.reduce(viewState) }
+            .onEach { setState(it) }
+            .launchIn(viewModelScope)
+
+
     /**
      * Returns the initial state of the view.
      */
@@ -60,18 +82,9 @@ abstract class BaseViewModel<VS : BaseViewState, VI : BaseIntent, VE : BaseViewE
     protected open fun getViewEventFromStateReducer(state: StateReducer<VS>): VE? =
         null
 
-    init {
-        viewModelScope.launch {
-            viewIntentFlow
-                .handleIntent()
-                .onEach { getViewEventFromStateReducer(it)?.let(::dispatchEvent) }
-                .scan(initialState) { viewState, change -> change.reduce(viewState) }
-                .onEach { setState(it) }
-                .launchIn(viewModelScope)
-        }
-    }
-
-
+    /**
+     * Sets the state for the view by updating the internal value of `_viewStateFlow`.
+     */
     private fun setState(state: VS) {
         _viewStateFlow.value = state
     }
