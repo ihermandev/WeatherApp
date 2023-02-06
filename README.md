@@ -26,8 +26,17 @@ Application should contain following screens:
   - Pressure 
   - UV index 
   - Sunrise and sunset time
-
+### Technology Stack
+* Kotlin Coroutines with Flow
+* MVI
+* Jetpack Compose
+* Room
+* Hilt
+* Retrofit
+* Google Places API
+* kotlinx-datetime
 ### Demo
+
 
 https://user-images.githubusercontent.com/25265967/179420588-14719e46-5fb3-4d40-a610-4303603f31f5.mp4
 
