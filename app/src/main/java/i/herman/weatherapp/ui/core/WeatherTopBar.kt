@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherSimpleTopBar(
     title: String?,
@@ -24,6 +25,7 @@ fun WeatherSimpleTopBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherTopBar(
     title: String?,
@@ -52,6 +54,7 @@ fun WeatherTopBar(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview("Simple Top App Bar")
 @Composable
 fun WeatherSimpleTopBarPreview() {
@@ -61,6 +64,7 @@ fun WeatherSimpleTopBarPreview() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview("Top App Bar")
 @Composable
 fun WeatherTopBarPreview() {

@@ -58,11 +58,12 @@ fun LocationDetailsRoute(
                     onEvent.invoke(LocationDetailEvent.OnBackClick)
                 }
                 is LocationDetailViewIntent.OnWeatherClick -> {
-                    onEvent.invoke(LocationDetailEvent.OnWeatherDetailsClick(
-                        date = locationDetailIntent.date,
-                        lat = locationDetailIntent.lat,
-                        lng = locationDetailIntent.lng
-                    )
+                    onEvent.invoke(
+                        LocationDetailEvent.OnWeatherDetailsClick(
+                            date = locationDetailIntent.date,
+                            lat = locationDetailIntent.lat,
+                            lng = locationDetailIntent.lng
+                        )
                     )
                 }
             }
@@ -82,9 +83,7 @@ private fun LocationDetailsScreen(
     locationDetailIntent: (LocationDetailViewIntent) -> Unit = {},
 ) {
 
-    val topAppBarScrollState: TopAppBarScrollState = rememberTopAppBarScrollState()
-    val scrollBehavior =
-        remember { TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarScrollState) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 
     Scaffold(
         modifier = modifier
@@ -120,11 +119,13 @@ private fun LocationDetailsScreen(
                             modifier = Modifier
                                 .padding(vertical = 8.dp, horizontal = 8.dp)
                                 .clickable {
-                                    locationDetailIntent(LocationDetailViewIntent.OnWeatherClick(
-                                        date = item.time,
-                                        lat = latitude,
-                                        lng = longitude
-                                    ))
+                                    locationDetailIntent(
+                                        LocationDetailViewIntent.OnWeatherClick(
+                                            date = item.time,
+                                            lat = latitude,
+                                            lng = longitude
+                                        )
+                                    )
                                 }
                         )
                     }
@@ -145,9 +146,11 @@ private fun ForecastItemHolder(
 ) {
 
     Card(modifier = modifier.fillMaxWidth()) {
-        Row(modifier = Modifier
-            .height(IntrinsicSize.Min)
-            .padding(8.dp)) {
+        Row(
+            modifier = Modifier
+                .height(IntrinsicSize.Min)
+                .padding(8.dp)
+        ) {
             Image(
                 modifier = Modifier.size(64.dp),
                 painter = painterResource(id = item.weatherType.weatherIcon),
@@ -156,9 +159,11 @@ private fun ForecastItemHolder(
 
             Spacer(modifier = Modifier.size(16.dp))
 
-            Column(modifier = Modifier
-                .width(120.dp)
-                .fillMaxHeight()) {
+            Column(
+                modifier = Modifier
+                    .width(120.dp)
+                    .fillMaxHeight()
+            ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         modifier = Modifier.size(12.dp),
@@ -173,7 +178,10 @@ private fun ForecastItemHolder(
                         text = item.time,
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.primary.copy(
-                                alpha = 0.4f)))
+                                alpha = 0.4f
+                            )
+                        )
+                    )
                 }
                 Text(
                     text = item.weatherType.weatherDescription,
@@ -181,9 +189,11 @@ private fun ForecastItemHolder(
                 )
             }
 
-            Column(modifier = Modifier.fillMaxSize(),
+            Column(
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center) {
+                verticalArrangement = Arrangement.Center
+            ) {
                 TemperatureLabelWithIcon(
                     icon = Icons.Rounded.KeyboardArrowUp,
                     iconTint = Color.Green,
@@ -231,7 +241,8 @@ private fun TemperatureLabelWithIcon(
 @Composable
 fun ForecastItemHolderFoggyPreview() {
     ForecastItemHolder(
-        item = ForecastItem(temperatureMax = 19.9,
+        item = ForecastItem(
+            temperatureMax = 19.9,
             temperatureMin = 12.4,
             time = "2021-11-11",
             weatherType = WeatherType.Foggy
@@ -243,7 +254,8 @@ fun ForecastItemHolderFoggyPreview() {
 @Composable
 fun ForecastItemHolderThunderstormPreview() {
     ForecastItemHolder(
-        item = ForecastItem(temperatureMax = 19.9,
+        item = ForecastItem(
+            temperatureMax = 19.9,
             temperatureMin = 12.4,
             time = "2021-11-11",
             weatherType = WeatherType.HeavyHailThunderstorm
